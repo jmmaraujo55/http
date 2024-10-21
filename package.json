@@ -1,0 +1,56 @@
+{
+  "name": "@joaoaraujodev/http",
+  "version": "1.0.0",
+  "description": "HTTP server",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "test": "node --import tsx --env-file=.env.sample --test __tests__/**/**.spec.ts",
+    "test:dev": "node --import tsx --env-file=.env.sample --test --watch __tests__/**/**.spec.ts",
+    "build": "rimraf dist && tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmmaraujo55/http.git"
+  },
+  "keywords": [
+    "auth",
+    "jwt"
+  ],
+  "author": "Joao Araujo <jmmaraujo55@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jmmaraujo55/http/issues"
+  },
+  "homepage": "https://github.com/jmmaraujo55/http#readme",
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "debug": "^4.3.7",
+    "express": "^4.21.1",
+    "glob": "^11.0.0",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.12",
+    "@types/express": "^5.0.0",
+    "@types/glob": "^8.1.0",
+    "@types/node": "^22.7.5",
+    "eslint": "^9.12.0",
+    "husky": "^9.1.6",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  }
+}
