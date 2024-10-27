@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { glob } from "glob";
-import { Request, Response } from "express";
-import { readFile } from "fs/promises"
+import { Request, Response, NextFunction } from "express";
+import { readFile } from "fs/promises";
 import logger from "../../../lib/logger";
 
 const _logger = logger("controller");
@@ -17,8 +17,14 @@ export function Controller(prefix: string = ""): ClassDecorator {
 
 function createRouteDecorator(method: string) {
   return (path: string): MethodDecorator => {
-    return (target, propertyKey) => {
+    return (target, propertyKey, descriptor: PropertyDescriptor) => {
       Reflect.defineMetadata("route", { method, path }, target, propertyKey);
+
+      const originalMethod = descriptor.value as (req: Request, res: Response, next: NextFunction) => any;
+
+      descriptor.value = function (req: Request, res: Response, next: NextFunction) {
+        return originalMethod.apply(this, [req, res, next]);
+      };
     };
   };
 }
@@ -32,11 +38,11 @@ export const Options = (path: string = "") => createRouteDecorator("options")(pa
 export const Head = (path: string = "") => createRouteDecorator("head")(path);
 
 export async function loadControllers() {
-  const basePath = process.cwd()
+  const basePath = process.cwd();
   const files = glob.sync(`${basePath}/**/*.ts`, { ignore: "**/node_modules/**" });
 
   for (const file of files) {
-    const content = await readFile(file, "utf-8")
+    const content = await readFile(file, "utf-8");
 
     if (/@Controller/.test(content)) await import(file);
   }
@@ -58,8 +64,8 @@ export async function registerControllers(app: Express.Application) {
 
         _logger.log(`${controller.name}::${method.toUpperCase()} => ${prefix}${path}`);
 
-        app[method](`${prefix}${path}`, (req: Request, res: Response) => {
-          instance[methodName](req, res);
+        app[method](`${prefix}${path}`, (req: Request, res: Response, next: NextFunction) => {
+          instance[methodName](req, res, next);
         });
       }
     }
