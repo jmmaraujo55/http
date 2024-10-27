@@ -1,4 +1,4 @@
-// export { default as Client } from "src/lib/client"
+export { default as Client } from "./lib/client"
 export { default as Server } from "./lib/server"
 export {
   Controller,
